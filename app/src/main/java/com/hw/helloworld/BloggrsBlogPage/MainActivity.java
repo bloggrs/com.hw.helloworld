@@ -15,6 +15,7 @@ import com.hw.helloworld.R;
 import com.hw.helloworld.Bloggrs.Post; // Adjust the package name as necessary
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import android.graphics.Typeface; // Import this line
 
@@ -58,49 +59,54 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getPosts() {
-        String postId = "1"; // Replace with an actual post ID
+        Map<String, String> options = new HashMap<>();
+        // Add any required query parameters to the options map
+        options.put("postId", "1"); // Example option; adjust as necessary
+
         Bloggrs.Posts postsApi = new Bloggrs.Posts(this.bloggrs);
 
-        postsApi.getPost(postId)
+        postsApi.getPosts(options)
                 .thenAccept(this::handlePostResult)
                 .exceptionally(this::handlePostError);
     }
 
-    private void handlePostResult(Bloggrs.Post post) {
-        LinearLayout postLayout = new LinearLayout(this);
-        postLayout.setOrientation(LinearLayout.VERTICAL);
-        postLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        ));
+    private void handlePostResult(List<Bloggrs.Post> posts) {
+        runOnUiThread(() -> {
+            postsListView.removeAllViews(); // Clear previous posts
+            for (Post post : posts) {
+                LinearLayout postLayout = new LinearLayout(this);
+                postLayout.setOrientation(LinearLayout.VERTICAL);
+                postLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                ));
 
-        // Title TextView
-        TextView titleTextView = new TextView(this);
-        titleTextView.setText(post.title);
-        titleTextView.setTextSize(18);
-        titleTextView.setTypeface(null, Typeface.BOLD);
+                // Title TextView
+                TextView titleTextView = new TextView(this);
+                titleTextView.setText(post.title);
+                titleTextView.setTextSize(18);
+                titleTextView.setTypeface(null, Typeface.BOLD);
+                titleTextView.setLayoutParams(new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                ));
+                titleTextView.setPadding(0, 0, 0, 8); // Adjust margin if needed
 
-        // LayoutParams for Title with margin
-        LinearLayout.LayoutParams titleParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        titleParams.setMargins(0, 0, 0, 8); // Set bottom margin for title
-        titleTextView.setLayoutParams(titleParams);
+                // Content TextView
+                TextView contentTextView = getTextView(post);
 
-        // Content TextView
-        TextView contentTextView = getTextView(post);
+                // Info TextView
+                TextView infoTextView = new TextView(this);
+                infoTextView.setText("0 likes | 0 comments | " + post.createdAt);
 
-        // Info TextView
-        TextView infoTextView = new TextView(this);
-        infoTextView.setText("0 likes | 0 comments | " + post.createdAt);
+                // Add Views to Layout
+                postLayout.addView(titleTextView);
+                postLayout.addView(contentTextView);
+                postLayout.addView(infoTextView);
 
-        // Add Views to Layout
-        postLayout.addView(titleTextView);
-        postLayout.addView(contentTextView);
-        postLayout.addView(infoTextView);
-
-        runOnUiThread(() -> postsListView.addView(postLayout));
+                postsListView.addView(postLayout); // No need for runOnUiThread here as it's already in the UI thread
+            }
+        });
     }
 
     @NonNull

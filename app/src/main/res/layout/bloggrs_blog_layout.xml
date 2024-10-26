@@ -37,12 +37,12 @@
             android:padding="16dp">
             <LinearLayout
                 android:id="@+id/postsListView"
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="16dp">
-                <!-- This is where posts will be added dynamically -->
-            </LinearLayout>
+                android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="0dp"> <!-- Remove or adjust padding -->
+            <!-- This is where posts will be added dynamically -->
+        </LinearLayout>
             <TextView
                 android:id="@+id/resultTextView"
                 android:layout_width="wrap_content"
